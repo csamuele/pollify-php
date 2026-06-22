@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\View;
 use App\Models\User;
 use PDOException;
+use App\Core\Csrf;
 
 class AuthController
 {
@@ -20,6 +21,7 @@ class AuthController
 
     public function register(): void
     {
+        Csrf::requireValid();
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
@@ -73,6 +75,7 @@ class AuthController
 
     public function login(): void
     {
+        Csrf::requireValid();
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
@@ -98,6 +101,7 @@ class AuthController
 
     public function logout(): void
     {
+        Csrf::requireValid();
         Auth::logout();
 
         header('Location: /login');

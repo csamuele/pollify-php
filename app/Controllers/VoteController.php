@@ -7,11 +7,13 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Models\Ballot;
 use App\Models\Poll;
+use App\Core\Csrf;
 
 class VoteController
 {
     public function store(): void
     {
+        Csrf::requireValid();
         Auth::requireLogin();
 
         $userId = Auth::userId();

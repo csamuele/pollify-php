@@ -1,6 +1,7 @@
 <h2>Login</h2>
 
 <form method="POST" action="/login">
+    <?= \App\Core\Csrf::field() ?>
     <div>
         <label for="email">Email</label>
         <input id="email" name="email" type="email" required>

@@ -28,4 +28,7 @@ $router->post('/login', 'AuthController@login');
 
 $router->post('/logout', 'AuthController@logout');
 
+$router->get('/polls/create', 'PollController@create');
+$router->post('/polls', 'PollController@store');
+
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

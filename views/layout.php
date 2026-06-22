@@ -8,7 +8,7 @@ use App\Core\Auth;
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($title ?? 'Pollify PHP', ENT_QUOTES, 'UTF-8') ?></title>
+    <title><?= e($title ?? 'Pollify PHP') ?></title>
 </head>
 <body>
     <header>
@@ -21,6 +21,7 @@ use App\Core\Auth;
 
     <?php if (Auth::check()): ?>
         <form method="POST" action="/logout" style="display: inline;">
+            <?= \App\Core\Csrf::field() ?>
             <button type="submit">Logout</button>
         </form>
     <?php else: ?>

@@ -1,6 +1,7 @@
 <h2>Register</h2>
 
 <form method="POST" action="/register">
+    <?= \App\Core\Csrf::field() ?>
     <div>
         <label for="name">Name</label>
         <input id="name" name="name" type="text" required>

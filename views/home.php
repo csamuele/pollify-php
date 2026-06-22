@@ -1,4 +1,4 @@
-<h2><?= htmlspecialchars($appName, ENT_QUOTES, 'UTF-8') ?></h2>
+<h2><title><?= e($appName ?? 'Pollify PHP') ?></title></h2>
 
 <p>Your vanilla PHP polling app is running.</p>
 
