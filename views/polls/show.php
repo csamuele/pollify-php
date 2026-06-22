@@ -13,6 +13,7 @@
                         type="radio"
                         name="poll_option_id"
                         value="<?= htmlspecialchars((string) $option['id'], ENT_QUOTES, 'UTF-8') ?>"
+                        required
                     >
                     <?= htmlspecialchars($option['option_text'], ENT_QUOTES, 'UTF-8') ?>
                 </label>
@@ -21,6 +22,22 @@
 
         <button type="submit">Vote</button>
     </form>
+<?php endif; ?>
+
+<h3>Results</h3>
+
+<?php if (empty($results)): ?>
+    <p>No results yet.</p>
+<?php else: ?>
+    <ul>
+        <?php foreach ($results as $result): ?>
+            <li>
+                <?= htmlspecialchars($result['option_text'], ENT_QUOTES, 'UTF-8') ?>:
+                <?= htmlspecialchars((string) $result['vote_count'], ENT_QUOTES, 'UTF-8') ?>
+                vote(s)
+            </li>
+        <?php endforeach; ?>
+    </ul>
 <?php endif; ?>
 
 <p>
