@@ -15,5 +15,6 @@ $router = new Router();
 $router->get('/', 'HomeController@index');
 $router->get('/about', 'HomeController@about');
 $router->get('/polls', 'PollController@index');
+$router->get('/polls/show', 'PollController@show');
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

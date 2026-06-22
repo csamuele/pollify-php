@@ -6,9 +6,9 @@
     <ul>
         <?php foreach ($polls as $poll): ?>
             <li>
-                <strong>
+                <a href="/polls/show?id=<?= htmlspecialchars((string) $poll['id'], ENT_QUOTES, 'UTF-8') ?>">
                     <?= htmlspecialchars($poll['question'], ENT_QUOTES, 'UTF-8') ?>
-                </strong>
+                </a>
                 <br>
                 <small>
                     Created at:

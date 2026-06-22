@@ -20,4 +20,42 @@ class Poll
 
         return $stmt->fetchAll();
     }
+
+    public static function find(int $id): ?array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT id, question, created_at
+             FROM polls
+             WHERE id = :id
+             LIMIT 1'
+        );
+
+        $stmt->execute([
+            'id' => $id,
+        ]);
+
+        $poll = $stmt->fetch();
+
+        return $poll ?: null;
+    }
+
+    public static function options(int $pollId): array
+    {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare(
+            'SELECT id, option_text
+             FROM poll_options
+             WHERE poll_id = :poll_id
+             ORDER BY id'
+        );
+
+        $stmt->execute([
+            'poll_id' => $pollId,
+        ]);
+
+        return $stmt->fetchAll();
+    }
 }
