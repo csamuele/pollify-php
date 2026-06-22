@@ -100,4 +100,44 @@ public static function results(int $pollId): array
 
     return $stmt->fetchAll();
 }
+public static function create(int $userId, string $question, array $options): ?int
+{
+    $db = Database::getConnection();
+
+    try {
+        $db->beginTransaction();
+
+        $stmt = $db->prepare(
+            'INSERT INTO polls (user_id, question)
+             VALUES (:user_id, :question)'
+        );
+
+        $stmt->execute([
+            'user_id' => $userId,
+            'question' => $question,
+        ]);
+
+        $pollId = (int) $db->lastInsertId();
+
+        $optionStmt = $db->prepare(
+            'INSERT INTO poll_options (poll_id, option_text)
+             VALUES (:poll_id, :option_text)'
+        );
+
+        foreach ($options as $option) {
+            $optionStmt->execute([
+                'poll_id' => $pollId,
+                'option_text' => $option,
+            ]);
+        }
+
+        $db->commit();
+
+        return $pollId;
+    } catch (\Throwable $e) {
+        $db->rollBack();
+
+        return null;
+    }
+}
 }

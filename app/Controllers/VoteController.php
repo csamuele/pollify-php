@@ -4,14 +4,25 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Auth;
 use App\Models\Ballot;
 use App\Models\Poll;
+use App\Core\Csrf;
 
 class VoteController
 {
     public function store(): void
     {
-        $userId = 1; // Temporary demo user until we build authentication.
+        Csrf::requireValid();
+        Auth::requireLogin();
+
+        $userId = Auth::userId();
+
+        if ($userId === null) {
+            http_response_code(401);
+            echo '<h1>You must be logged in to vote.</h1>';
+            return;
+        }
 
         $pollId = (int) ($_POST['poll_id'] ?? 0);
         $pollOptionId = (int) ($_POST['poll_option_id'] ?? 0);
