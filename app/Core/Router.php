@@ -8,12 +8,12 @@ class Router
 {
     private array $routes = [];
 
-    public function get(string $path, callable $handler): void
+    public function get(string $path, callable|string $handler): void
     {
         $this->routes['GET'][$path] = $handler;
     }
 
-    public function post(string $path, callable $handler): void
+    public function post(string $path, callable|string $handler): void
     {
         $this->routes['POST'][$path] = $handler;
     }
@@ -30,6 +30,40 @@ class Router
 
         $handler = $this->routes[$method][$path];
 
-        $handler();
+        if (is_callable($handler)) {
+            $handler();
+            return;
+        }
+
+        if (is_string($handler)) {
+            $this->dispatchController($handler);
+            return;
+        }
+
+        http_response_code(500);
+        echo '<h1>Invalid route handler</h1>';
+    }
+
+    private function dispatchController(string $handler): void
+    {
+        [$controllerName, $methodName] = explode('@', $handler);
+
+        $controllerClass = "App\\Controllers\\{$controllerName}";
+
+        if (!class_exists($controllerClass)) {
+            http_response_code(500);
+            echo "<h1>Controller not found: {$controllerName}</h1>";
+            return;
+        }
+
+        $controller = new $controllerClass();
+
+        if (!method_exists($controller, $methodName)) {
+            http_response_code(500);
+            echo "<h1>Method not found: {$methodName}</h1>";
+            return;
+        }
+
+        $controller->$methodName();
     }
 }
