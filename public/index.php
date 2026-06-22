@@ -3,8 +3,12 @@
 declare(strict_types=1);
 
 use App\Core\Router;
+use Dotenv\Dotenv;
 
 require_once __DIR__ . '/../vendor/autoload.php';
+
+$dotenv = Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->safeLoad();
 
 $router = new Router();
 
