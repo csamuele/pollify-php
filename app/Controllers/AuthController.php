@@ -47,8 +47,17 @@ class AuthController
         try {
             User::create($name, $email, $password);
         } catch (PDOException $e) {
-            http_response_code(409);
-            echo '<h1>An account with this email may already exist.</h1>';
+            error_log($e->getMessage());
+
+            http_response_code(500);
+
+            if (($_ENV['APP_ENV'] ?? 'local') === 'production') {
+                echo '<h1>Registration failed. Check the app logs for details.</h1>';
+            } else {
+                echo '<h1>Registration failed</h1>';
+                echo '<pre>' . e($e->getMessage()) . '</pre>';
+            }
+
             return;
         }
 
