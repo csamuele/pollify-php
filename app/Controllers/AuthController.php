@@ -9,6 +9,7 @@ use App\Core\View;
 use App\Models\User;
 use PDOException;
 use App\Core\Csrf;
+use App\Core\Flash;
 
 class AuthController
 {
@@ -27,21 +28,18 @@ class AuthController
         $password = $_POST['password'] ?? '';
 
         if ($name === '' || $email === '' || $password === '') {
-            http_response_code(400);
-            echo '<h1>Name, email, and password are required.</h1>';
-            return;
+            Flash::set('error', 'Name, email, and password are required.');
+            redirect('/register');
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            http_response_code(400);
-            echo '<h1>Please enter a valid email address.</h1>';
-            return;
+            Flash::set('error', 'Please enter a valid email address.');
+            redirect('/register');
         }
 
         if (strlen($password) < 8) {
-            http_response_code(400);
-            echo '<h1>Password must be at least 8 characters.</h1>';
-            return;
+            Flash::set('error', 'Password must be at least 8 characters.');
+            redirect('/register');
         }
 
         try {
@@ -52,7 +50,7 @@ class AuthController
             http_response_code(500);
 
             if (($_ENV['APP_ENV'] ?? 'local') === 'production') {
-                echo '<h1>Registration failed. Check the app logs for details.</h1>';
+                Flash::set('error', 'Registration failed. Please try again later.');
             } else {
                 echo '<h1>Registration failed</h1>';
                 echo '<pre>' . e($e->getMessage()) . '</pre>';
@@ -71,8 +69,8 @@ class AuthController
 
         Auth::login((int) $user['id']);
 
-        header('Location: /polls');
-        exit;
+        Flash::set('success', 'Account created. You are now logged in.');
+        redirect('/polls');
     }
 
     public function showLogin(): void
@@ -89,23 +87,21 @@ class AuthController
         $password = $_POST['password'] ?? '';
 
         if ($email === '' || $password === '') {
-            http_response_code(400);
-            echo '<h1>Email and password are required.</h1>';
-            return;
+            Flash::set('error', 'Email and password are required.');
+            redirect('/login');
         }
 
         $user = User::findByEmail($email);
 
         if ($user === null || !password_verify($password, $user['password_hash'])) {
-            http_response_code(401);
-            echo '<h1>Invalid email or password.</h1>';
-            return;
+            Flash::set('error', 'Invalid email or password.');
+            redirect('/login');
         }
 
         Auth::login((int) $user['id']);
 
-        header('Location: /polls');
-        exit;
+        Flash::set('success', 'You are now logged in.');
+        redirect('/polls');
     }
 
     public function logout(): void
@@ -113,7 +109,7 @@ class AuthController
         Csrf::requireValid();
         Auth::logout();
 
-        header('Location: /login');
-        exit;
+        Flash::set('success', 'You have been logged out.');
+        redirect('/login');
     }
 }
