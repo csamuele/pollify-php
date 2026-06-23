@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Models\Ballot;
 use App\Models\Poll;
 use App\Core\Csrf;
+use App\Core\Flash;
 
 class VoteController
 {
@@ -19,35 +20,31 @@ class VoteController
         $userId = Auth::userId();
 
         if ($userId === null) {
-            http_response_code(401);
-            echo '<h1>You must be logged in to vote.</h1>';
-            return;
+            Flash::set('error', 'You must be logged in to vote.');
+            redirect('/login');
         }
 
         $pollId = (int) ($_POST['poll_id'] ?? 0);
         $pollOptionId = (int) ($_POST['poll_option_id'] ?? 0);
 
         if ($pollId <= 0 || $pollOptionId <= 0) {
-            http_response_code(400);
-            echo '<h1>Invalid vote data</h1>';
-            return;
+            Flash::set('error', 'Invalid vote data.');
+            redirect('/polls');
         }
 
         if (!Poll::optionBelongsToPoll($pollId, $pollOptionId)) {
-            http_response_code(400);
-            echo '<h1>Invalid poll option</h1>';
-            return;
+            Flash::set('error', 'Invalid poll option.');
+            redirect('/polls');
         }
 
         $created = Ballot::create($userId, $pollId, $pollOptionId);
 
         if (!$created) {
-            http_response_code(409);
-            echo '<h1>You have already voted in this poll.</h1>';
-            return;
+            Flash::set('error', 'You have already voted in this poll.');
+            redirect("/polls/show?id={$pollId}");
         }
 
-        header("Location: /polls/show?id={$pollId}");
-        exit;
+        Flash::set('success', 'Vote submitted successfully.');
+        redirect("/polls/show?id={$pollId}");
     }
 }

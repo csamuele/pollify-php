@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\View;
 use App\Models\Poll;
 use App\Core\Csrf;
+use App\Core\Flash;
 
 class PollController
 {
@@ -47,15 +48,13 @@ class PollController
         $options = $_POST['options'] ?? [];
 
         if ($question === '') {
-            http_response_code(400);
-            echo '<h1>Question is required.</h1>';
-            return;
+            Flash::set('error', 'Question is required.');
+            redirect('/polls/create');
         }
 
         if (!is_array($options)) {
-            http_response_code(400);
-            echo '<h1>Options must be submitted as an array.</h1>';
-            return;
+            Flash::set('error', 'Options must be submitted as an array.');
+            redirect('/polls/create');
         }
 
         $cleanOptions = [];
@@ -69,21 +68,19 @@ class PollController
         }
 
         if (count($cleanOptions) < 2) {
-            http_response_code(400);
-            echo '<h1>Please provide at least two options.</h1>';
-            return;
+            Flash::set('error', 'Please provide at least two options.');
+            redirect('/polls/create');
         }
 
         $pollId = Poll::create($userId, $question, $cleanOptions);
 
         if ($pollId === null) {
-            http_response_code(500);
-            echo '<h1>Poll could not be created.</h1>';
-            return;
+            Flash::set('error', 'Poll could not be created.');
+            redirect('/polls/create');
         }
 
-        header("Location: /polls/show?id={$pollId}");
-        exit;
+        Flash::set('success', 'Poll created successfully.');
+        redirect("/polls/show?id={$pollId}");
     }
 
     public function show(): void
